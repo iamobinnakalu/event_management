@@ -1,6 +1,7 @@
 
 import 'dart:io';
 import 'dart:convert';
+import 'package:collection/collection.dart';
 
 
 class Event{
@@ -47,12 +48,12 @@ Event({
 
 class Attendee{
 
-  //Initialization of the Event Management class variables
+  //Initialization of the Attendee class variables
   String name;
   bool isPresent;
 
-  //Here is the Event Management Constructor
-  Attendee(this.name, {this.isPresent = false});
+  //Here is the Attendee class Constructor
+  Attendee(this.name, {this.isPresent = true});
 
   @override
   String toString(){
@@ -67,7 +68,7 @@ class Attendee{
   factory Attendee.fromJson(Map<String, dynamic> json) {
     return Attendee(
      json['name'], 
-     isPresent: json['isPresent'] ?? false,
+     isPresent: json['isPresent'] ?? true,
      );
   }
 }
@@ -122,12 +123,13 @@ void addNewEvent(List<Event> events) {
 }
 
 
+
 void editEvent(List<Event> events) {
   print('Enter The Title Of The Event To Edit:');
   String title = stdin.readLineSync()!;
-  Event? event = events.firstWhere(
-    (event) => event.title == title,
-    //orElse: () => null,
+  Event? event = events.firstWhereOrNull(
+    (event) => event.title == title
+    
   );
 
   if (event != null) {
@@ -171,7 +173,7 @@ void listEvents(List<Event> events) {
 void registerAttendee(List<Event> events) {
   print('Enter The Title Of The Event:');
   String title = stdin.readLineSync()!;
-  Event? event = events.firstWhere(
+  Event? event = events.firstWhereOrNull(
     (event) => event.title == title,
       //orElse: () => null,
   );
@@ -190,9 +192,9 @@ void registerAttendee(List<Event> events) {
 void viewAttendees(List<Event> events) {
   print('Enter The Title Of The Event:');
   String title = stdin.readLineSync()!;
-  Event? event = events.firstWhere(
+  Event? event = events.firstWhereOrNull(
     (event) => event.title == title,
-   // orElse: () => null,
+    //orElse: () => null,
   );
 
   if (event != null) {
@@ -213,7 +215,7 @@ void viewAttendees(List<Event> events) {
 void markAttendance(List<Event> events) {
   print('Enter The Title Of The Event:');
   String title = stdin.readLineSync()!;
-  Event? event = events.firstWhere(
+  Event? event = events.firstWhereOrNull(
     (event) => event.title == title,
     //orElse: () => null,
   );
@@ -221,9 +223,9 @@ void markAttendance(List<Event> events) {
   if (event != null) {
     print('Enter The Name Of The Attendee:');
     String name = stdin.readLineSync()!;
-    Attendee? attendee = event.attendees.firstWhere(
+    Attendee? attendee = event.attendees.firstWhereOrNull(
       (attendee) => attendee.name == name,
-     // orElse: () => null,
+      //orElse: () => null,
     );
 
     if (attendee != null) {
@@ -244,7 +246,7 @@ void main() {
   
 
   while (true) {
-    print('Tech Hub Event Manager');
+    print('Rad5 Tech Hub Event Manager System');
     print('1. Add New Event');
     print('2. Edit Event');
     print('3. Delete Event');
