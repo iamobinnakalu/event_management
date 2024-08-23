@@ -1,88 +1,90 @@
 
+
 import 'dart:io';
 import 'dart:convert';
 import 'package:collection/collection.dart';
 
+class Event {
+  // Initialization of the Event class variables
+  String title;
+  DateTime dateTime;
+  String location;
+  String description;
+  List<Attendee> attendees;
 
-class Event{
-
-//initialization of the Event class variables
-String title;
-DateTime dateTime;
-String location;
-String description;
-List<Attendee> attendees;
-
-//Here is  an Event class constructor
-Event({
-  required this.title,
-  required this.dateTime,
-  required this.location,
-  required this.description,
-  required this.attendees,
+  // Event class constructor
+  Event({
+    required this.title,
+    required this.dateTime,
+    required this.location,
+    required this.description,
+    required this.attendees,
   });
 
   @override
   String toString() {
-    return'Event: $title at $location on $dateTime with $description'; 
+    return 'Event: $title at $location on $dateTime with $description';
   }
 
+  // Convert Event object to JSON
   Map<String, dynamic> toJson() => {
-    'title': title,
-    'dateTime': dateTime.toIso8601String(),
-    'location': location,
-    'description': description,
-    'attendees': attendees.map((a) => a.toJson()).toList(),
-  };
+        'title': title,
+        'dateTime': dateTime.toIso8601String(),
+        'location': location,
+        'description': description,
+        'attendees': attendees.map((a) => a.toJson()).toList(),
+      };
 
+  // Convert JSON to Event object
   factory Event.fromJson(Map<String, dynamic> json) {
     return Event(
-     title: json['title'],
-     dateTime: DateTime.parse(json['datetime']), 
-     location: json['location'], 
-     description: json['description'], 
-     attendees: (json['attendees'] as List).map((a) => Attendee.fromJson(a)).toList(),
-     );
+      title: json['title'],
+      dateTime: DateTime.parse(json['dateTime']), // Correct field name
+      location: json['location'],
+      description: json['description'],
+      attendees:
+          (json['attendees'] as List).map((a) => Attendee.fromJson(a)).toList(),
+    );
   }
 }
 
-class Attendee{
-
-  //Initialization of the Attendee class variables
+class Attendee {
+  // Initialization of the Attendee class variables
   String name;
   bool isPresent;
 
-  //Here is the Attendee class Constructor
+  // Attendee class constructor
   Attendee(this.name, {this.isPresent = true});
 
   @override
-  String toString(){
-    return'Attendee: $name is Present $isPresent';
+  String toString() {
+    return 'Attendee: $name is Present: $isPresent';
   }
 
+  // Convert Attendee object to JSON
   Map<String, dynamic> toJson() => {
-  'name': name,
-  'isPresent': isPresent,
-  };
+        'name': name,
+        'isPresent': isPresent,
+      };
 
+  // Convert JSON to Attendee object
   factory Attendee.fromJson(Map<String, dynamic> json) {
     return Attendee(
-     json['name'], 
-     isPresent: json['isPresent'] ?? true,
-     );
+      json['name'],
+      isPresent: json['isPresent'] ?? true,
+    );
   }
 }
 
-
-
-//Saving The Program To A JSON File Format
+// Saving events to a JSON file
 void saveEvents(List<Event> events) {
   File file = File('events.json');
-  List<Map<String, dynamic>> jsonEvents = events.map((e) => e.toJson()).toList();
+  List<Map<String, dynamic>> jsonEvents =
+      events.map((e) => e.toJson()).toList();
   file.writeAsStringSync(jsonEncode(jsonEvents));
 }
 
-//Loading The Program From A JSON File
+// Loading events from a JSON file
 List<Event> loadEvents() {
   File file = File('events.json');
   if (file.existsSync()) {
@@ -90,78 +92,67 @@ List<Event> loadEvents() {
     List<dynamic> jsonList = jsonDecode(content);
     return jsonList.map((e) => Event.fromJson(e)).toList();
   }
-  return[];
+  return [];
 }
-
 
 void addNewEvent(List<Event> events) {
-
-  print("Enter Event Title");
+  print("Enter Event Title:");
   String title = stdin.readLineSync()!;
-  
-  print('Enter event date and time (YYYY-MM-DD  HH:MM):');
-  DateTime dateTime = DateTime.parse(stdin.readLineSync()!);
-  
-  print('Enter event location');
-  String location = stdin.readLineSync()!;
-  
-  print('Enter event description');
-  String description = stdin.readLineSync()!;
-  
 
+  print('Enter event date and time (YYYY-MM-DD HH:MM):');
+  DateTime dateTime = DateTime.parse(stdin.readLineSync()!);
+
+  print('Enter event location:');
+  String location = stdin.readLineSync()!;
+
+  print('Enter event description:');
+  String description = stdin.readLineSync()!;
 
   events.add(Event(
-    title: title, 
-    dateTime: dateTime, 
-    location: location, 
+    title: title,
+    dateTime: dateTime,
+    location: location,
     description: description,
     attendees: [],
-    ));
+  ));
 
   print('Event Added Successfully!\n');
-
 }
 
-
-
 void editEvent(List<Event> events) {
-  print('Enter The Title Of The Event To Edit:');
+  print('Enter the title of the event to edit:');
   String title = stdin.readLineSync()!;
-  Event? event = events.firstWhereOrNull(
-    (event) => event.title == title
-    
-  );
+  Event? event = events.firstWhereOrNull((event) => event.title == title);
 
   if (event != null) {
-    print('Enter New Title:');
+    print('Enter new title:');
     event.title = stdin.readLineSync()!;
 
-    print('Enter New Date And Time (YYYY-MM-DD HH:MM):');
+    print('Enter new date and time (YYYY-MM-DD HH:MM):');
     event.dateTime = DateTime.parse(stdin.readLineSync()!);
 
-    print('Enter New Location:');
+    print('Enter new location:');
     event.location = stdin.readLineSync()!;
 
-    print('Enter New Description:');
+    print('Enter new description:');
     event.description = stdin.readLineSync()!;
 
-    print('Event Update Successfully!\n');
+    print('Event updated successfully!\n');
   } else {
-    print('Event Not Found!\n');
+    print('Event not found!\n');
   }
 }
 
-
 void deleteEvent(List<Event> events) {
-  print('Enter The Title Of The Event To Delete:');
+  print('Enter the title of the event to delete:');
   String title = stdin.readLineSync()!;
   events.removeWhere((event) => event.title == title);
-  print('Event Delete Successfully!\n');
+  print('Event deleted successfully!\n');
 }
 
 void listEvents(List<Event> events) {
   if (events.isEmpty) {
-    print('No Events Found.\n');
+    print('No events found.\n');
   } else {
     for (var event in events) {
       print(event);
@@ -171,79 +162,63 @@ void listEvents(List<Event> events) {
 }
 
 void registerAttendee(List<Event> events) {
-  print('Enter The Title Of The Event:');
+  print('Enter the title of the event:');
   String title = stdin.readLineSync()!;
-  Event? event = events.firstWhereOrNull(
-    (event) => event.title == title,
-      //orElse: () => null,
-  );
- 
+  Event? event = events.firstWhereOrNull((event) => event.title == title);
+
   if (event != null) {
-    print('Enter The Name OF The Attendee:');
+    print('Enter the name of the attendee:');
     String name = stdin.readLineSync()!;
     event.attendees.add(Attendee(name));
-    print('Attendee Registered Successfully!\n');
+    print('Attendee registered successfully!\n');
   } else {
-    print('Event Not Found!\n');
+    print('Event not found!\n');
   }
 }
 
-
 void viewAttendees(List<Event> events) {
-  print('Enter The Title Of The Event:');
+  print('Enter the title of the event:');
   String title = stdin.readLineSync()!;
-  Event? event = events.firstWhereOrNull(
-    (event) => event.title == title,
-    //orElse: () => null,
-  );
+  Event? event = events.firstWhereOrNull((event) => event.title == title);
 
   if (event != null) {
     if (event.attendees.isEmpty) {
-      print('No Attendees Registered.\n');
+      print('No attendees registered.\n');
     } else {
       for (var attendee in event.attendees) {
         print(attendee);
       }
       print('');
-      }
+    }
   } else {
-    print('Event Not Found!\n');
+    print('Event not found!\n');
   }
 }
 
-
 void markAttendance(List<Event> events) {
-  print('Enter The Title Of The Event:');
+  print('Enter the title of the event:');
   String title = stdin.readLineSync()!;
-  Event? event = events.firstWhereOrNull(
-    (event) => event.title == title,
-    //orElse: () => null,
-  );
+  Event? event = events.firstWhereOrNull((event) => event.title == title);
 
   if (event != null) {
-    print('Enter The Name Of The Attendee:');
+    print('Enter the name of the attendee:');
     String name = stdin.readLineSync()!;
-    Attendee? attendee = event.attendees.firstWhereOrNull(
-      (attendee) => attendee.name == name,
-      //orElse: () => null,
-    );
+    Attendee? attendee =
+        event.attendees.firstWhereOrNull((attendee) => attendee.name == name);
 
     if (attendee != null) {
       attendee.isPresent = true;
       print('Attendance marked successfully!\n');
     } else {
-      print('Attendee Not Found!\n');
+      print('Attendee not found!\n');
     }
   } else {
-    print('Event Not Found!\n');
+    print('Event not found!\n');
   }
 }
-  
-
 
 void main() {
-  List<Event> events = [];
-  
+  List<Event> events = loadEvents();
 
   while (true) {
     print('Rad5 Tech Hub Event Manager System');
@@ -254,9 +229,8 @@ void main() {
     print('5. Register Attendee');
     print('6. View Attendees');
     print('7. Mark Attendance');
-    print('8. Exit');
-    print('Enter Your Choice:');
-
+    print('8. Save and Exit');
+    print('Enter your choice:');
 
     String? choice = stdin.readLineSync();
 
@@ -271,15 +245,16 @@ void main() {
     } else if (choice == '5') {
       registerAttendee(events);
     } else if (choice == '6') {
-      viewAttendees(events) ;
+      viewAttendees(events);
     } else if (choice == '7') {
       markAttendance(events);
     } else if (choice == '8') {
-      print('Goodbye!');
+      saveEvents(events);
+      print('Saving...');
+      print('Exiting...');
       return;
     } else {
-      print('Invalid Choice, Please Try Again.');
+      print('Invalid choice, please try again.');
     }
   }
-} 
-
+}
